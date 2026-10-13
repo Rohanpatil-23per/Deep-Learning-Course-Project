@@ -1,0 +1,32 @@
+# IMMUNEX synthetic threat variants — safe telemetry for local model testing.
+# These are log records only; they do not contain executable attack payloads.
+
+[2026-09-22 10:00:01] FAILED_AUTH user=admin src=45.12.98.221 dst=10.0.0.20 attempts=126 proto=SSH port=22 result=DENY
+[2026-09-22 10:00:16] FAILED_AUTH user=svc_backup src=45.12.98.221 dst=10.0.0.20 attempts=463 proto=SSH port=22 result=DENY
+[2026-09-22 10:01:03] AUTH_ALERT src=103.35.74.10 dst=10.0.0.15 brute_force=true account=finance-admin failures=71
+
+[2026-09-22 10:03:10] PORT_SCAN src=91.92.248.101 dst_range=10.0.0.0/24 ports=1-1024 rate=880pps proto=TCP
+[2026-09-22 10:03:24] NETWORK_RECON src=91.92.248.101 dst=10.0.0.31 service=RDP port=3389 probe=connection_attempt
+[2026-09-22 10:03:42] PORT_SCAN src=91.92.248.101 dst_range=10.0.1.0/24 ports=22,80,443,445,3389 rate=240pps
+
+[2026-09-22 10:05:08] WEB_ALERT src=77.88.21.4 dst=10.0.0.40 path=/login attack=SQL_INJECTION query_pattern=union_select status=403
+[2026-09-22 10:05:31] WAF_BLOCK src=77.88.21.4 dst=10.0.0.40 path=/api/users attack=SQL_INJECTION suspicious_parameter=id status=403
+[2026-09-22 10:05:55] APP_SECURITY src=77.88.21.4 dst=10.0.0.40 attack=SQL_INJECTION request_denied=true
+
+[2026-09-22 10:07:20] OUTBOUND_CONN src=194.28.115.42 dst=10.0.0.55 dst_port=443 proto=HTTPS beacon=true interval=30s
+[2026-09-22 10:07:50] DNS_QUERY src=10.0.0.55 query=sync-updates.example.invalid type=TXT c2_beacon=true
+[2026-09-22 10:08:20] PROCESS_ALERT host=WORKSTATION-07 process=suspicious-agent.exe action=beacon dst=194.28.115.42
+
+[2026-09-22 10:10:03] FILE_RENAME src=185.220.101.55 dst=10.0.0.62 file=finance.xlsx new=finance.xlsx.locked ransomware=true
+[2026-09-22 10:10:11] FILE_RENAME src=185.220.101.55 dst=10.0.0.62 file=payroll.csv new=payroll.csv.locked ransomware=true
+[2026-09-22 10:10:24] ENDPOINT_ALERT host=FINANCE-WS-02 src=185.220.101.55 action=encrypt file_count=48 ransomware=true
+
+[2026-09-22 10:12:44] DNS_QUERY src=45.129.33.21 dst=10.0.0.53 query=chunk-001.exfil.attacker.invalid type=TXT exfil=true
+[2026-09-22 10:12:58] DATA_LOSS_ALERT src=45.129.33.21 dst=203.0.113.45 bytes=52428800 action=exfiltration protocol=HTTPS
+[2026-09-22 10:13:16] FILE_ACCESS src=45.129.33.21 host=RESEARCH-01 path=/data/customer_export.csv action=download suspicious=true
+
+[2026-09-22 10:15:06] PROCESS_CREATE host=DC-PRIMARY-01 parent=winword.exe child=cmd.exe action=credential_access mimikatz=true
+[2026-09-22 10:15:21] ENDPOINT_ALERT src=172.16.8.19 dst=10.0.0.10 process=unknown.exe action=credential_dumping blocked=true
+
+[2026-09-22 10:17:00] NET_FLOW src=198.51.100.42 dst=10.0.0.80 port=443 proto=TCP bytes=9823450 duration=1000ms ddos=true flood=true
+[2026-09-22 10:17:05] FIREWALL_ALERT src=198.51.100.42 dst=10.0.0.80 event=traffic_flood packets=150000 rate=150000pps

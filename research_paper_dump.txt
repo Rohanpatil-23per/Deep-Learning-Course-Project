@@ -1,0 +1,161 @@
+=== DOC: Report for deep learning cp/Research paper.docx ===
+=== PARAGRAPHS (116) ===
+[P0]  IMMUNEX: An Intelligent Multi-Layer System for Threat Detection, Attack Correlation, and Automated Response Recommendation in Banking Networks
+[P1] Prof Snehal Shinde
+Department of Computer Science with Artificial Intelligence 
+Vishwakarma Institute of Technology
+Pune, India
+snehal.shinde@vit.edu 
+[P2] Pranay Zunzunwala
+Department of Computer Science with Artificial Intelligence
+Vishwakarma Institute of Technology
+Pune, India
+pranay.zunzunwala24@vit.edu Rohan Patil
+Department of Computer Science with Artificial Intelligence
+Vishwakarma Institute of Technology
+Pune, India
+rohan.patil24@vit.edu 
+[P3] Niv Porwal
+Department of Computer Science with Artificial Intelligence
+Vishwakarma Institute of Technology
+Pune, India
+niv.porwal24@vit.edu 
+Purva Patil
+Department of Computer Science with Artificial Intelligence
+Vishwakarma Institute of Technology
+Pune, India
+purva.patil243@vit.edu 
+[P6] Abstract— Attacks against the network infrastructure represent multistage attacks of very high complexity which cannot possibly be detected using any form of signature-based and single-model analysis approach. In this paper, we present IMMUNEX – intelligent microservices architecture for banking networks featuring threat detection, attack correlation, and response recommendations. Normalized logs (Syslog, JSON, CEF, NetFlow, Windows Event XML) and routing of logs to five levels of architecture via central orchestrator, Kafka, Redis, Elasticsearch, and WireGuard mTLS mesh network are comprised of the following components: (1) detection by RoBERTa embeddings, FAISS similarity algorithm, Isolation Forest, and IOC database stored in Redis; (2) attack correlation via BiLSTM and Graph Attention Network algorithms and MITRE ATT&CK framework; (3) autonomous action when actions recommended by Deep Q-Network policy engine and validated by Z3 theorem prover pass the gate controlled by human-in-the-loop; (4) learning without catastrophic forgetting and (5) threat memory based on LSTM-HMM kill-chain prediction, SQLite attacker profiles, and Phi-3-mini incident playbooks. Testing of our system on CICIDS2018 and UNSW-NB15 data sets revealed our pooled AUC exceeding 0.998 with minimal misclassification rate.
+[P7] Keywords —Banking cybersecurity, attack correlation, anomaly detection, automated response, formal verification, graph attention networks, MITRE ATT&CK.
+[P8] I. Introduction
+[P9] With the growing digitization trend within the banking industry, there has been an increase in cyber attacks' number and complexity. In such cases, there have been staged, coordinated, and zero-day cyber attacks targeted at the banking system to gain the required financial information and also to disrupt the system operations. However, there have been many problems with the intrusion detection system (IDS) and control systems currently deployed. For instance, the IDS and control systems operate using signatures that are easily prone to new and polymorphic attacks, apart from the fact that learning detectors mostly detect anomalies separately and do not know the attacks across the whole network.
+[P10] Currently, there are three limitations to autonomous AI technology within the financial industry. Firstly, some of the autonomous AI models are black boxes, and analysts lack a clear understanding as to why there has been the anomaly. Secondly, automatic reaction to the anomaly may be risky, because a response to the anomaly may disrupt operations within the database and also affect the clients in the banking system. Lastly, many of these models are unable to learn from the previous attacks other than creating new models.
+[P11] To cope with those problems, this paper presents IMMUNEX – a novel intelligent multi-layered system for security threat detection, attack correlation, and automatic actions. Specifically, inspired by the biological immune system, the proposed IMMUNEX framework consists of five microservice layers, controlled by the main controller: innate detection, attack correlation, automated action, adaptive learning and model update, and threat memory. Contributions of this work are: (i) context-aware logs data ingestion which performs normalization and pre-filtering of log data; (ii) the use of semantic analysis, vector similarity analysis, and anomaly detection with fast_IOC lookup; (iii) attack correlation based on graph with MITRE ATT&CK correlation; (iv) response mechanism in which each recommendation is proved by theorem prover (Z3), and also requires a human approval; and (v) learning and model update without forgetting threats.
+[P12] II. Literature Review
+[P13] Paduraru et al. [1] propose a novel technique called CyberPlaybookLLM that consists of fine-tuned LLaMA 3.1 8B model able to convert incident structured data into mitigation strategies and CACAO-compliant response playbooks. The model relies on MITRE ATT&CK-aligned data, JSON middleware, post-processing and SIEM/SOAR integration, and in this regard, the smaller models perform as good as the larger ones while using less computational power. However, in the context of this approach, the playbooks generation is the only function performed by the system without considering anomaly detection and formal verification of actions.
+[P14] Contrary, Hossain [2] has designed a model referred to as DQ-IDS, which is based on the use of deep Q-Networks, experience replay, adaptive epsilon-greedy exploration, and reward-based learning. The proposed model demonstrates the accuracy of 97.18% and is able to adjust itself according to changes in attacks. In this model, the response action is the only output of detection. No multi-stage attacks correlation, response action verification, or human intervention is taken into account.
+[P15] BS-GAT algorithm is provided by Wang et al. [3], where network flows are treated as graph nodes, which are connected with each other through behavioral-similarity relations to provide the Graph Attention Network with an opportunity to learn features of flows and their relations. Obtained neighborhoods will be more balanced and useful for intrusion classification. The paper is restricted only to network layer of IDS and does not touch the questions of logging, response orchestration, and attacker memory.
+[P16] Widuliski [4] provides a review of artificial immune systems, negative selection, positive selection, and clonal selection approaches to detect anomalies, malware, and local attacks. These approaches can adapt themselves to new or zero-day attacks as biological immunity. This is a review article, therefore, there is no solution suggested with mentioning of such problems as false positives, parameters tuning, and scalability.
+[P17] Darem et al. [5] offer classification of cyber attacks on banks based on their gravity and technological characteristics and recommend actions for protection through technical, organizational, legislative, and regulatory measures from ransomware, data leaks, DDoS, frauds, and social engineering attacks. The paper offers a valuable perspective from banking point of view, but it is very theoretical without AI involvement.
+[P18] LogBERT Ensemble models with bootstrapping normal logs sequences and majority voting was proposed by Zuev and Semidolin [6]. F1-scores of the LogBERT models on LogHub datasets are the following: HDFS – 86.43%, BGL – 93.34%, Thunderbird-mini and Spirit – 100%. On average, it gives 3.95% improvement of a single LogBERT model performance. There are multiple transformers used, and the discovered anomalies are not correlated into attack chains and mapped to validated actions.
+[P19] Sissodiya et al. [7] transform Kubernetes RBAC and admission-control policies into first-order logic and apply SMT solver to identify violations of security invariants. It is especially crucial for the IMMUNEX project since it shows that the recommended security actions may be validated before their implementation. This approach does not provide any help in intrusion response but prevents pre-deployment misconfigurations of access policies.
+[P20] Isolation Forest algorithm [8] divides rare observations randomly into several groups. Path length of an anomaly is shorter than path length of normal observation. The algorithm has linear complexity, uses limited memory resources, and works effectively on large high-dimensional data sets. However, Isolation Forest processes objects independently and does not consider temporal, semantic, and multi-event characteristics of the data set.
+[P21] The work LogBERT [9] that uses the method of learning normal log-sequence patterns by masking log message prediction and hypersphere volume minimization. Transformer encoder in LogBERT can learn long-range dependencies and perform better than previous works on three log datasets. However, one model can suffer from data shifts, data imbalances, and different logging formats with no response selection and safety validation.
+[P22] [10] combines fraud detection, state evaluation, automatic response, and recovery policies in an end-to-end closed loop self-healing financial security architecture. It was shown that there was 35% decrease in the level of system instability and the number of steps needed for returning to a normal mode of operation of 3.6 in a real credit card dataset. Nonetheless, the paper focuses on fraud in transactions only by means of classical baseline classifiers, but ignores raw logs detection, graph attack analysis, response validation, and attacker profiling.
+[P23] TABLE I. COMPARISON OF RELATED WORK (Y: SUPPORTED, P: PARTIAL, -: NOT ADDRESSED)
+[P25] Comparison table (Table I) between the above-mentioned researches and IMMUNEX. There are solutions for the existing literature which solve anomalies individually such as anomaly detection in log files, behavior analysis, intrusion detection through graphs, intelligent response systems, and continuous learning. But there is a very small amount of studies which combine all the above mentioned aspects in one single banking system. IMMUNEX resolves this issue.
+[P26] III. Methodology
+[P27] IMMUNEX comprises a collection of loosely-coupled microservices as depicted in Fig. 1. Log sources are ingested in the ingestion phase; orchestrator distributes events to five layers in accordance with the biological immune system model; and results are fed into SOC web dashboard, active remediation controls, and incident playbooks. Messaging, caching, auditing, and security capabilities are incorporated into the architecture. Table II below highlights various layers, the components of each layer, and the technologies used in them.
+[P28] A. Design Goals and Threat Model
+[P29] The design of IMMUNEX is based on four goals which are derived from the issues outlined in Section I: (1) explainability, where the explanation for an attack is provided in the form of an ATT&CK mapped attack narrative and playbook; (2) operational safety, where an action is taken only after authentication and verification; (3) adaptability, where models are updated based on the verified incidents; and (4) privacy and resilience, where the processing takes place locally, mutual authentication among microservices is ensured, and faults are isolated by the orchestrator. Threats arise from external as well as internal adversaries who launch
+[P30] multi-stage attacks (e.g., DDoS, infiltration, botnet, and web attacks) against network, host, and identity targets.
+[P32] .
+[P35] Fig. 1. Architecture chart depicting IMMUNEX components: log ingestion, orchestrator, microservices layers, and shared infrastructure and outputs.
+[P36] TABLE II. HIGH-LEVEL DESCRIPTION OF IMMUNEX LAYERS, COMPONENTS, AND TECHNLOGIES
+[P38] B. Logs ingestion and pre-processing
+[P39] Due to the variety of log formats produced in the banking environment, IMMUNEX is able to accept Syslog, JSON, Common Event Format (CEF), NetFlow, and Windows Event XML logs. Additionally, there is Context-Aware Log Parser which converts log information into standard format and attaches context such as host name, user, source IP, destination IP, and timestamp to the event. Fast Pre-check filter performs light pre-filtering and rejects malformed events, as well as prioritizes events with indicators.
+[P40] C. Central Orchestrator (:8000)
+[P41] Orchestrator is a point of control in this architecture. Events are distributed to layers services. The Relevance Filter drops duplicate and irrelevant events concerning the protected assets. Token Bucket Rate Limiter manages spikes in the traffic, and Circuit Breaker isolates faulty layers.
+[P43] D. Layer 1: Innate Detection (:8001)
+[P44] The innate detection layer helps in achieving signatureless and speedy detection of all possible threats. To detect any kind of security threats through the analysis of log text files, the Semantic Analysis Engine uses the RoBERTa model [11], which is responsible for creating embeddings from log text data. The Vector Similarity Database makes use of FAISS [12] to index those embeddings and find out the Euclidean distance between the vector under consideration and the cluster of normal behavior, and whenever the vector surpasses a certain threshold value, it is recognized as spatial anomaly. In addition, the Anomaly Detection Engine relies on the Isolation Forest [8] algorithm to identify the anomalies in resource access behavioral features (analysis of user and entity behavior), and short isolation paths point to abnormal behavior. The results from both engines are considered to calculate the anomaly score depending on the risk level.
+[P45] E. Layer 2: Attack Correlation (:8002)
+[P46] In layer 2, anomalies are contextualized. In Graph-Based Correlation Engine, an event timeline graph is created where nodes are the entities including IP addresses, hosts, users, and actions while the edges are action sequences. The Graph Attention Network (GAT) [13] creates awareness between nodes and a BiLSTM captures the sequence of events; therefore, it is a T-GNN. Narrative and Sequence Tracker develops a narrative of correlated events; therefore, it becomes possible to distinguish between benign errors and malicious attacks. MITRE ATT&CK Mapping [15] classifies each phase based on Tactics and Techniques.
+[P47] F. Layer 3: Autonomous Response (:8003)
+[P48]    In layer 3, the detected threats in layer 2 are made safer by performing four different actions. The Response Policy Decision Engine uses the Deep Q-Network (DQN) approach to evaluate the degree of danger and select the action (such as IP blacklisting and host isolation) with the highest ratio between mitigation and impact. The Z3 Theorem Prover Safety Verifier [14] finds out the constraints that correspond to the security policies of the bank and determines if any of the suggested actions conflicts with these constraints. For example, blacklisting the IP address of the core banking system or isolating the server where the required database is hosted will violate one of the constraints and not be implemented. Then, the second best solution will be considered. The actions that are found to be safe will be forwarded to the Human-in-the-Loop (HITL) Gate and here the administrator can either approve or reject these actions using the SOC dashboard. The Action Execution action implements the selected actions using active remediation (firewall blacklisting and host isolation).
+[P49] G. Layer 4: Adaptive Model Refinement (:8004)
+[P50] Layer 4 implements a continual learning process. Attack vectors confirmed by administrator decisions, together with synthetic variants generated on demand by an Artificial Immune System (AIS) mutation engine, are used to update the detection and correlation models. To obtain system-wide immunity without catastrophic forgetting [17], new samples are combined with stored representative earlier samples (rehearsal), so previously learned threats remain detectable. Refined models are redeployed to the layers, closing the learning loop.
+[P51] H. Layer 5: Threat Memory (:8005)
+[P52] The fifth layer involves using and learning from the threat history. The Kill-Chain Prediction Engine uses LSTM-HMM to predict the next move of the attacker based on the reconstructed attack chain and therefore, implementing preventive measures. The SQLite Attacker Profiles contain the techniques, indicators, time stamps, and decision of the final admin for each attacker; whenever there is a repeat of an attack from the same attacker or a similar attack vector, the technique that was earlier used to defeat the attacker is accessed based on vector similarity.
+[P53] I. Common Infrastructure
+[P54] Four infrastructural elements serve all layers. For the event bus system, there is Apache Kafka that offers decoupling between producers and consumers, thus allowing for asynchronous and replayable communication between layers. Redis supports caching and pub/sub functionality for data that should be accessed in less latency, for example, the IOC state. Elasticsearch keeps an audit log of all events, decisions, and actions that are needed for auditing at some point. A WireGuard mesh with mTLS ensures the security of all communications between services.
+[P55] J. Datasets
+[P56] The datasets that will be used for training, validation and testing of models on dummy bank dataset include CICIDS2017, CICIDS2018, NSL-KDD and UNSW-NB15. The datasets contain normal traffic and attacks of different types including DDoS attack, Infiltration attack, Botnet attack and Web attacks. They have been divided into training, validation and testing datasets. These datasets will be used by the AIS to generate seed datasets for generating synthetic variations.
+[P57] K. End to end Workflow
+[P58] The log files will be processed and validated by the orchestrator and will then be fed to Layer 1 for scoring the anomalies. The anomalies that have been scored with high confidence will be passed to Layer 2 for plotting and mapping to ATT&CK techniques. The attacks that have been correlated will be sent to Layer 3 where the policy engine will recommend an action, which will be verified for its accuracy by the Z3 verifier and sanctioned by the HITL gate. The verified actions will be forwarded to Layer 4 for updating the models, which will be stored in Layer 5.
+[P59] Algorithm 2: IMMUNEX event processing algorithm
+[P60] Inputs: event e. Outputs: recommendation r, playbook p.
+[P61] 1. Let e' = Parse(e); Discard e' if PreCheck is unsatisfactory; Filter e' if RelevanceFilter(e') returns false.
+[P62] 2. Submit e' to Layer 1 using the orchestrator (rate limiter, circuit breaker).
+[P63] 3. Let s = Aggregate(FAISS distance of e', Isolation Forest score of e'), let ioc = RedisLookup(e').
+[P64] 4. If s ≥ τ or ioc == true, submit e' to Layer 2, otherwise continue.
+[P65] 5. Update graph G based on e', Let C = Track(G), classify C using ATT&CK tactics.
+[P66] 6. Layer 3: a = DQNPolicy(C); if Z3Verify(a) returns unsafe then take next best action.
+[P67] 7. Submit a and playbook p to the HITL gate, execute a if approved, otherwise record.
+[P68] 8. Record the decision in the audit store; record vectors for Layer 4.
+[P69] 9. Layer 5: update attacker profile, predict next kill chain step using LSTM-HMM.
+[P71] IV. Results and Discussion
+[P72] The intrusion detection in the CICIDS2018 complex network and the host-based anomaly and network anomaly in the UNSW-NB15 have been carried out through the use of IMMUNEX. The effectiveness of IMMUNEX is demonstrated in that AUC value obtained for ROC analysis is 0.998 and the loss curve converged without overfitting. Contrasting the centralized rule-based techniques, IMMUNEX relates multi-step attack and Z3 verifier, and HITL gate ensures continuous functioning of the bank by the algorithm.
+[P73] A. Performance of Multi-Layer Defense Algorithm
+[P74] This model integrates the spatial anomalies (Layer 1) and temporal sequence and relational graph (Layer 2) into a severity score based on purely local computation for ensuring the security of the bank.
+[P75] B. Receiver Operating Characteristic (ROC) Analysis
+[P77] Fig. 2. ROC curves of the IMMUNEX models on CICIDS2018 and UNSW-NB15.
+[P78] The ROC curves for both data sets are presented in Fig. 2. The AUC value for the CICIDS2018 data set is 0.9992 for the spatial clusters and 0.9985 for the behavioral isolation, which means that the average AUC equals 0.9989. For the UNSW-NB15 data set, the AUC values are 0.9995 for the spatial clusters, 0.9972 for the behavioral isolation, and 0.9984 for the average AUC.
+[P79] C. Training and Validation Loss Analysis
+[P81] Fig. 3. Training and validation loss curves of the correlation (T-GNN/LSTM) models.
+[P82] Figure 3 shows the loss function for training and validation. For CICIDS2018, there is an initial drop of the loss function until 30th epoch but then there is steady convergence until 40th epoch, with some differences. However, for UNSW-NB15, the loss function maintains steadiness for 80 epochs even if the loss function has started at a different level.
+[P83] D. Confusion Matrix Analysis
+[P85] Fig. 4. Confusion matrices: (a) CICIDS2018 and (b) UNSW-NB15.
+[P86] As shown in Fig. 4, for CICIDS2018 data set, there are 3842 TN, 1521 TP, 4 FP, and 2 FN while for UNSW-NB15 data set, there are 3410 TN, 1285 TP, 6 FP, and 5 FN. It is clear from the values of the metrics in Table III that these values are above 99.5%, which includes false positive rate of 0.10% and 0.18%. Very small number of attacks that are not detected is of great significance in banking.
+[P87] TABLE III. CLASSIFICATION METRICS DERIVED FROM FIG. 4
+[P89] E. Discussion and Limitations
+[P90] All the results obtained so far are based on the benchmarking information and concern only the detection and correlation models. But the safety of Z3 Verifier and HITL Gate has to be defined along with the throughput of the microservice deployment since it affects the analysis process and the response time estimation. This is the limitation of the current conclusions.
+[P91] V. FUTURE SCOPE
+[P92] There are some improvements that can be made. First of all, federated learning will help train the correlation and refinement models of the malware using the global threat vectors but not revealing the client's data. Second, the extended action space of the policy engine will allow deploying such active defenses as dynamic micro-segmentation and honeypot generation; this will be verified with the help of Z3 Verifier and HITL gate. Third, multi-modal language models will analyze the memory dump and execution flow of the binaries to increase the efficiency of the detection model for the obfuscated zero-day malware. Fourth, the benchmarks of the throughput and latency of the microservice deployment are necessary.
+[P93] VI. Conclusion
+[P94] This research paper has defined the concept of IMMUNEX – an intelligent multiple layers system for detection of threat, correlation of attack and response selection for the attacks against the banking infrastructure. The layers of the microservices include the contextual ingestion pipeline and the orchestrator with RoBERTa, FAISS and Isolation Forest Detection, BiLSTM and GAT-based Correlation with MITRE ATT&CK mapping, DQN-based Response Selection, validated by the Z3 theorem prover and human-in-the-loop gate, Continual Learning and Threat Memory with persistent kill chain prediction and Phi-3-mini playbooks. The evaluation of CICIDS2018 and UNSW-NB15 dataset shows that the pooled AUC score is more than 0.998 and accuracy more than 99.7%. Thus, IMMUNEX is a secure, explainable and adaptive system for banking infrastructure.
+[P95] Acknowledgment
+[P96] We would like to express our gratitude towards Vishwakarma Institute of Technology for the provision of facilities for our research, and Prof. Snehal Shinde for guiding us in our research process.
+[P97] .
+[P98] References
+[P99] [1]	C. Paduraru, B. Dumitru, and A. Stefanescu, “Automated generation of cybersecurity response playbooks via large language models,” Procedia Comput. Sci., vol. 270, pp. 2987–2996, 2025.
+[P100] [2]	M. A. Hossain, “Deep Q-learning intrusion detection system (DQ-IDS): A novel reinforcement learning approach for adaptive and self-learning cybersecurity,” ICT Express, vol. 11, pp. 875–880, 2025.
+[P101] [3]	Y. Wang, Z. Han, J. Li, and X. He, “BS-GAT: Behavior similarity based graph attention network for network intrusion detection,” arXiv:2304.07226, 2023.
+[P102] [4]	P. Widuliski, “Artificial immune systems in local and network cybersecurity: An overview of intrusion detection strategies,” Appl. Cybersecurity Internet Governance, vol. 2, no. 1, 2023.
+[P103] [5]	A. A. Darem, A. A. Alhashmi, T. M. Alkhaldi, A. M. Alashjaee, S. M. Alanazi, and S. A. Ebad, “Cyber threats classifications and countermeasures in banking and financial sector,” IEEE Access, vol. 11, pp. 125138–125158, 2023.
+[P104] [6]	M. E. Zuev and A. D. Semidolin, “Deep anomaly detection in unstructured system log files with ensemble-based learning,” in Proc. 2026 ElCon Conf. Young Researchers Comput., Process., Inf. Security, 2026.
+[P105] [7]	A. Sissodiya, E. Chiquito, U. Bodin, and J. Kristiansson, “Formal verification for preventing misconfigured access policies in Kubernetes clusters,” IEEE Access, vol. 13, Art. no. 141798, 2025.
+[P106] [8]	F. T. Liu, K. M. Ting, and Z.-H. Zhou, “Isolation forest,” in Proc. 8th IEEE Int. Conf. Data Mining, 2008, pp. 413–422.
+[P107] [9]	H. Guo, S. Yuan, and X. Wu, “LogBERT: Log anomaly detection via BERT,” in Proc. Int. Joint Conf. Neural Netw. (IJCNN), 2021, pp. 1–8.
+[P108] [10]	M. B. Nagaraja, D. R. Palavali, A. Jain, and R. Y. Hosamani, “Self-healing security orchestration for financial fraud systems: Autonomous incident response and infrastructure stabilization,” in Proc. IEEE SoutheastCon, 2026.
+[P109] [11]	Y. Liu et al., “RoBERTa: A robustly optimized BERT pretraining approach,” arXiv:1907.11692, 2019.
+[P110] [12]	J. Johnson, M. Douze, and H. Jégou, “Billion-scale similarity search with GPUs,” IEEE Trans. Big Data, vol. 7, no. 3, pp. 535–547, 2021.
+[P111] [13]	P. Veličković et al., “Graph attention networks,” in Proc. Int. Conf. Learn. Represent. (ICLR), 2018.
+[P112] [14]	L. de Moura and N. Bjørner, “Z3: An efficient SMT solver,” in Proc. TACAS, 2008, pp. 337–340.
+[P113] [15]	B. E. Strom et al., “MITRE ATT&CK: Design and philosophy,” MITRE Corp., McLean, VA, USA, Tech. Rep., 2018.
+[P114] [16]	M. Abdin et al., “Phi-3 technical report: A highly capable language model locally on your phone,” arXiv:2404.14219, 2024.
+[P115] [17]	G. I. Parisi, R. Kemker, J. L. Part, C. Kanan, and S. Wermter, “Continual lifelong learning with neural networks: A review,” Neural Netw., vol. 113, pp. 54–71, 2019.
+
+=== TABLES (3) ===
+
+--- Table 1 (12 rows, 7 cols) ---
+Row 0: Work | Detect. | Correl. | Resp. | Verif. | HITL | Learn.
+Row 1: [1] Paduraru | - | - | Y | - | - | -
+Row 2: [2] Hossain | Y | - | - | - | - | Y
+Row 3: [3] Wang | Y | P | - | - | - | -
+Row 4: [4] Widuliski | Y | - | - | - | - | P
+Row 5: [5] Darem | - | - | - | - | - | -
+Row 6: [6] Zuev | Y | - | - | - | - | -
+Row 7: [7] Sissodiya | - | - | - | Y | - | -
+Row 8: [8] Liu | Y | - | - | - | - | -
+Row 9: [9] Guo | Y | - | - | - | - | -
+Row 10: [10] Nagaraja | Y | - | Y | - | - | -
+Row 11: IMMUNEX | Y | Y | Y | Y | Y | Y
+
+--- Table 2 (9 rows, 4 cols) ---
+Row 0: Layer | Port | Components | Key technologies
+Row 1: Ingestion | - | Context-aware log parser; fast first-pass validation | Syslog, JSON, CEF, NetFlow, Windows Event XML
+Row 2: Orchestrator | 8000 | Log routing; token bucket rate limiter; circuit breaker; metrics; relevance filter | Central control plane
+Row 3: L1 Innate Detection | 8001 | Semantic parsing; anomaly detection; vector similarity indexing; Redis IOC | RoBERTa, FAISS, Isolation Forest, Redis
+Row 4: L2 Attack Correlation | 8002 | Graph-based correlation; narrative and sequence tracker; ATT&CK mapping | BiLSTM, GAT, MITRE ATT&CK
+Row 5: L3 Autonomous Response | 8003 | Autonomous response policy decision making; safety verification; HITL gate; action execution | DQN, Z3 theorem prover
+Row 6: L4 Adaptive Refinement | 8004 | Lifelong learning on validated attack vectors | Rehearsal, AIS mutation engine
+Row 7: L5 Threat Memory | 8005 | Kill-chain prediction; attacker profiling; playbooks generation | LSTM-HMM, SQLite, Phi-3-mini
+Row 8: Shared infrastructure | - | Event bus; cache and pub/sub; auditing; secure transport | Kafka, Redis, Elasticsearch, WireGuard + mTLS
+
+--- Table 3 (6 rows, 3 cols) ---
+Row 0: Metric | CICIDS2018 | UNSW-NB15
+Row 1: Accuracy (%) | 99.89 | 99.77
+Row 2: Precision (%) | 99.74 | 99.54
+Row 3: Recall (%) | 99.87 | 99.61
+Row 4: F1-score (%) | 99.80 | 99.57
+Row 5: False positive rate (%) | 0.10 | 0.18

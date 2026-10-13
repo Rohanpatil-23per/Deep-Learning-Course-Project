@@ -1,0 +1,14 @@
+# IMMUNEX synthetic normal baseline — safe telemetry for false-positive testing.
+
+[2026-09-22 09:00:01] AUTH_SUCCESS user=svc_monitor src=10.0.0.10 dst=10.0.0.5 method=cert proto=HTTPS result=SUCCESS
+[2026-09-22 09:00:15] FIREWALL_ALLOW src=192.168.1.55 dst=10.0.0.5 port=443 proto=TCP bytes=2048
+[2026-09-22 09:00:31] DNS_QUERY src=10.0.2.11 query=api.bank.internal type=A ttl=300
+[2026-09-22 09:00:44] HTTP_GET src=172.16.0.5 dst=10.0.0.25 path=/health status=200 latency=4ms
+[2026-09-22 09:01:02] SSH_LOGIN user=sysadmin src=192.168.1.22 dst=10.0.1.5 auth=pubkey result=SUCCESS
+[2026-09-22 09:01:19] NET_FLOW src=10.0.0.10 dst=10.0.0.2 port=5432 proto=TCP bytes=8192 duration=120ms
+[2026-09-22 09:01:33] FILE_ACCESS user=app_svc host=APP-01 path=/var/log/app.log action=READ bytes=4096
+[2026-09-22 09:01:49] DATABASE_QUERY user=reporting_svc src=10.0.0.18 dst=10.0.0.2 action=SELECT rows=24 status=SUCCESS
+[2026-09-22 09:02:05] BACKUP_COMPLETE host=BACKUP-01 target=/archive/daily-2026-09-22.tar bytes=104857600 status=SUCCESS
+[2026-09-22 09:02:21] PATCH_STATUS host=WORKSTATION-07 package=browser-update version=128.4 status=INSTALLED
+[2026-09-22 09:02:39] VPN_LOGIN user=analyst01 src=192.168.20.41 dst=10.0.0.1 mfa=true result=SUCCESS
+[2026-09-22 09:02:57] API_REQUEST user=mobile-service src=10.0.3.21 dst=10.0.0.40 path=/v1/accounts status=200 latency=18ms

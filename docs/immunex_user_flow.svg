@@ -1,0 +1,228 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 660" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 600; fill: #1e293b; text-anchor: middle; }
+      .box-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; text-anchor: middle; }
+      .box-desc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11.5px; font-weight: 500; text-anchor: middle; }
+      .box-small { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 500; text-anchor: middle; }
+      .combine-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; font-weight: 600; fill: #c2410c; text-anchor: middle; }
+      .bar-text-main { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; fill: #854d0e; text-anchor: middle; }
+      .bar-text-sub { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 500; fill: #a16207; text-anchor: middle; }
+      .dash-text-title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 700; fill: #78350f; }
+      .dash-text-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 11.5px; font-weight: 500; fill: #92400e; }
+      .arrow { stroke: #64748b; stroke-width: 1.6; fill: none; marker-end: url(#arrowhead); }
+      .arrow-dark { stroke: #475569; stroke-width: 1.8; fill: none; marker-end: url(#arrowhead-dark); }
+    </style>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#64748b" />
+    </marker>
+    <marker id="arrowhead-dark" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#475569" />
+    </marker>
+    <filter id="card-shadow" x="-3%" y="-4%" width="106%" height="108%" filterUnits="objectBoundingBox">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="1000" height="660" fill="#ffffff"/>
+
+  <!-- Top Title -->
+  <text x="500" y="32" class="title">User Flow</text>
+
+  <!-- ================= ROW 1: INGESTION ================= -->
+  <!-- Cyan Trigger Pill: New Network Log / Telemetry -->
+  <g filter="url(#card-shadow)">
+    <rect x="30" y="52" width="215" height="48" rx="14" fill="#cffafe" stroke="#06b6d4" stroke-width="1.6"/>
+    <!-- Shield / Log Icon -->
+    <g transform="translate(42, 63)">
+      <path d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4zm0 2.18l7 3.11v4.71c0 4.54-3.14 8.79-7 9.94-3.86-1.15-7-5.4-7-9.94V7.29l7-3.11z" fill="#0891b2"/>
+      <path d="M11 7h2v6h-2zm0 8h2v2h-2z" fill="#0891b2"/>
+    </g>
+    <text x="145" y="73" class="box-title" fill="#0e7490">New network alert</text>
+    <text x="145" y="88" class="box-desc" fill="#0891b2">or syslog stream</text>
+  </g>
+
+  <!-- Arrow: Ingest -> Analyze -->
+  <path d="M245 76 L273 76" class="arrow"/>
+
+  <!-- Blue Box 1: FastAPI Orchestrator / Ingestion -->
+  <g filter="url(#card-shadow)">
+    <rect x="275" y="52" width="220" height="48" rx="14" fill="#bae6fd" stroke="#0284c7" stroke-width="1.6"/>
+    <text x="385" y="73" class="box-title" fill="#0369a1">Analyze telemetry</text>
+    <text x="385" y="88" class="box-desc" fill="#0284c7">(FastAPI :8000, rate limiter)</text>
+  </g>
+
+  <!-- Arrow: Analyze -> Normalize -->
+  <path d="M495 76 L523 76" class="arrow"/>
+
+  <!-- Blue Box 2: Normalize & Filter -->
+  <g filter="url(#card-shadow)">
+    <rect x="525" y="52" width="220" height="48" rx="14" fill="#bae6fd" stroke="#0284c7" stroke-width="1.6"/>
+    <text x="635" y="73" class="box-title" fill="#0369a1">Extract features &amp; normalize</text>
+    <text x="635" y="88" class="box-desc" fill="#0284c7">(Redis 60s de-dup, Alert schema)</text>
+  </g>
+
+  <!-- Branching Arrows from Row 1 to Row 2 -->
+  <path d="M635 100 L635 116" class="arrow"/>
+  <!-- Split horizontal bus -->
+  <path d="M140 116 L865 116" stroke="#64748b" stroke-width="1.6" fill="none"/>
+  <!-- Down arrows into 4 pillars -->
+  <path d="M140 116 L140 134" class="arrow"/>
+  <path d="M380 116 L380 134" class="arrow"/>
+  <path d="M625 116 L625 134" class="arrow"/>
+  <path d="M865 116 L865 134" class="arrow"/>
+
+  <!-- ================= ROW 2: 4 MULTI-MODAL PILLARS ================= -->
+  <!-- 1. Yellow Box: Tabular Metrics 77-d (CICIDS) -->
+  <g filter="url(#card-shadow)">
+    <rect x="30" y="136" width="220" height="52" rx="14" fill="#fef08a" stroke="#eab308" stroke-width="1.6"/>
+    <text x="140" y="158" class="box-title" fill="#854d0e">CICIDS Metrics</text>
+    <text x="140" y="174" class="box-desc" fill="#a16207">77-d vector</text>
+  </g>
+
+  <!-- 2. Purple Box: NLP Embeddings 768-d (RoBERTa) -->
+  <g filter="url(#card-shadow)">
+    <rect x="270" y="136" width="220" height="52" rx="14" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="1.6"/>
+    <text x="380" y="158" class="box-title" fill="#5b21b6">RoBERTa (NLP)</text>
+    <text x="380" y="174" class="box-desc" fill="#6d28d9">768-d vector</text>
+  </g>
+
+  <!-- 3. Green Box: Temporal Narrative 128-d (BiLSTM) -->
+  <g filter="url(#card-shadow)">
+    <rect x="515" y="136" width="220" height="52" rx="14" fill="#bbf7d0" stroke="#22c55e" stroke-width="1.6"/>
+    <text x="625" y="158" class="box-title" fill="#15803d">History (BiLSTM)</text>
+    <text x="625" y="174" class="box-desc" fill="#16a34a">128-d vector</text>
+  </g>
+
+  <!-- 4. Light Green Box: Attack Graph 64-d (GATv2) -->
+  <g filter="url(#card-shadow)">
+    <rect x="755" y="136" width="220" height="52" rx="14" fill="#bbf7d0" stroke="#10b981" stroke-width="1.6"/>
+    <text x="865" y="158" class="box-title" fill="#047857">Dependency (GATv2)</text>
+    <text x="865" y="174" class="box-desc" fill="#059669">64-d vector</text>
+  </g>
+
+  <!-- Arrows from Row 2 down to Combine Bar -->
+  <path d="M140 188 L140 216" class="arrow"/>
+  <path d="M380 188 L380 216" class="arrow"/>
+  <path d="M625 188 L625 216" class="arrow"/>
+  <path d="M865 188 L865 216" class="arrow"/>
+
+  <!-- ================= ROW 3: COMBINE FEATURES BAR ================= -->
+  <g filter="url(#card-shadow)">
+    <rect x="30" y="218" width="945" height="42" rx="14" fill="#ffedd5" stroke="#f97316" stroke-width="1.6"/>
+    <text x="502" y="244" class="combine-text">Combine features: 768 + 128 + 64 + 77 = 1,037</text>
+  </g>
+
+  <!-- Arrow down from Combine Bar to Row 4 -->
+  <path d="M140 260 L140 286" class="arrow"/>
+
+  <!-- ================= ROW 4: POLICY & CALIBRATION CHAIN ================= -->
+  <!-- 1. Magenta Box 1: Dueling DQN Policy -->
+  <g filter="url(#card-shadow)">
+    <rect x="30" y="288" width="220" height="54" rx="14" fill="#fbcfe8" stroke="#ec4899" stroke-width="1.6"/>
+    <text x="140" y="310" class="box-title" fill="#be185d">Policy Network (DQN)</text>
+    <text x="140" y="327" class="box-desc" fill="#db2777">1037 → 512 → 128 → 4</text>
+  </g>
+
+  <!-- Arrow: DQN -> Z3 -->
+  <path d="M250 315 L273 315" class="arrow"/>
+
+  <!-- 2. Magenta Box 2: Formal Verification (Z3 Prover) -->
+  <g filter="url(#card-shadow)">
+    <rect x="275" y="288" width="215" height="54" rx="14" fill="#fbcfe8" stroke="#ec4899" stroke-width="1.6"/>
+    <text x="382" y="310" class="box-title" fill="#be185d">Formal Verification</text>
+    <text x="382" y="327" class="box-desc" fill="#db2777">(Z3 Theorem Prover)</text>
+  </g>
+
+  <!-- Arrow: Z3 -> Anomaly Score -->
+  <path d="M490 315 L513 315" class="arrow"/>
+
+  <!-- 3. Orange Box 1: Anomaly Probability -->
+  <g filter="url(#card-shadow)">
+    <rect x="515" y="288" width="220" height="54" rx="14" fill="#fed7aa" stroke="#f97316" stroke-width="1.6"/>
+    <text x="625" y="310" class="box-title" fill="#c2410c">Anomaly score</text>
+    <text x="625" y="327" class="box-desc" fill="#ea580c">e.g. 0.85</text>
+  </g>
+
+  <!-- Arrow: Anomaly Score -> Risk Band -->
+  <path d="M735 315 L758 315" class="arrow"/>
+
+  <!-- 4. Orange Box 2: Risk Band LOW to CRITICAL -->
+  <g filter="url(#card-shadow)">
+    <rect x="760" y="288" width="215" height="54" rx="14" fill="#fed7aa" stroke="#f97316" stroke-width="1.6"/>
+    <text x="867" y="310" class="box-title" fill="#c2410c">Risk band</text>
+    <text x="867" y="327" class="box-desc" fill="#ea580c">LOW to CRITICAL</text>
+  </g>
+
+  <!-- Arrow down from Risk Band to Incident Risk -->
+  <path d="M867 342 L867 376" class="arrow"/>
+
+  <!-- ================= ROW 5: VERDICT & ACTION PRIORITY ================= -->
+  <!-- Orange Box: Incident Risk 85% -->
+  <g filter="url(#card-shadow)">
+    <rect x="760" y="378" width="215" height="48" rx="14" fill="#fed7aa" stroke="#f97316" stroke-width="1.6"/>
+    <text x="867" y="399" class="box-title" fill="#c2410c">Incident risk</text>
+    <text x="867" y="414" class="box-desc" fill="#ea580c">85%</text>
+  </g>
+
+  <!-- Arrow left: Incident Risk -> Priority Score Bar -->
+  <path d="M760 402 L713 402" class="arrow"/>
+
+  <!-- Yellow Bar: Action-level priority score -->
+  <g filter="url(#card-shadow)">
+    <rect x="30" y="378" width="680" height="48" rx="14" fill="#fef9c3" stroke="#eab308" stroke-width="1.6"/>
+    <text x="370" y="398" class="bar-text-main">Action-level priority score</text>
+    <text x="370" y="414" class="bar-text-sub">execution-order signal, formal safety guarantees before active intervention</text>
+  </g>
+
+  <!-- Down arrows into 3 Priority Action Cards -->
+  <path d="M140 426 L140 452" class="arrow"/>
+  <path d="M382 426 L382 452" class="arrow"/>
+  <path d="M625 426 L625 452" class="arrow"/>
+
+  <!-- Card 1: Red - ISOLATE / BLOCK (High Priority) -->
+  <g filter="url(#card-shadow)">
+    <rect x="30" y="454" width="220" height="52" rx="14" fill="#fecaca" stroke="#ef4444" stroke-width="1.6"/>
+    <text x="140" y="476" class="box-title" fill="#b91c1c">isolate_host / block</text>
+    <text x="140" y="493" class="box-desc" fill="#dc2626">HIGH priority (SOC gate)</text>
+  </g>
+
+  <!-- Card 2: Orange - RATE-LIMIT / MONITOR (Medium Priority) -->
+  <g filter="url(#card-shadow)">
+    <rect x="272" y="454" width="220" height="52" rx="14" fill="#fed7aa" stroke="#f97316" stroke-width="1.6"/>
+    <text x="382" y="476" class="box-title" fill="#c2410c">rate_limit / deep_inspect</text>
+    <text x="382" y="493" class="box-desc" fill="#ea580c">MEDIUM priority</text>
+  </g>
+
+  <!-- Card 3: Green - DO_NOTHING / LOG (Low Priority) -->
+  <g filter="url(#card-shadow)">
+    <rect x="515" y="454" width="220" height="52" rx="14" fill="#bbf7d0" stroke="#22c55e" stroke-width="1.6"/>
+    <text x="625" y="476" class="box-title" fill="#15803d">do_nothing / audit_log</text>
+    <text x="625" y="493" class="box-desc" fill="#16a34a">LOW priority</text>
+  </g>
+
+  <!-- ================= ROW 6: DASHBOARD PANEL ================= -->
+  <!-- Container Panel -->
+  <g filter="url(#card-shadow)">
+    <rect x="30" y="534" width="945" height="106" rx="18" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.6"/>
+
+    <!-- Left Brand Badge: React + FastAPI / IMMUNEX -->
+    <g transform="translate(62, 555)">
+      <!-- Custom Badge Icon -->
+      <rect x="0" y="4" width="135" height="56" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.4"/>
+      <!-- React atom symbol or IMMUNEX logo -->
+      <circle cx="28" cy="32" r="6" fill="#0284c7"/>
+      <ellipse cx="28" cy="32" rx="18" ry="7" fill="none" stroke="#0284c7" stroke-width="1.8" transform="rotate(30 28 32)"/>
+      <ellipse cx="28" cy="32" rx="18" ry="7" fill="none" stroke="#0284c7" stroke-width="1.8" transform="rotate(90 28 32)"/>
+      <ellipse cx="28" cy="32" rx="18" ry="7" fill="none" stroke="#0284c7" stroke-width="1.8" transform="rotate(150 28 32)"/>
+      <text x="56" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" fill="#0f172a">IMMUNEX</text>
+      <text x="56" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#64748b">React + Vite</text>
+    </g>
+
+    <!-- Right Summary Lines -->
+    <text x="245" y="567" class="dash-text-title">dashboard: incident risk 85%, mitigation actions ranked High / Medium / Low</text>
+    <text x="245" y="591" class="dash-text-body">Backend maps the verified DQN policy &amp; Z3 safety proofs to automated execution</text>
+    <text x="245" y="613" class="dash-text-body">Action priority = where SOC analysts intervene first (1-click approval for isolate)</text>
+  </g>
+</svg>

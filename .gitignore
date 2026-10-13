@@ -1,0 +1,48 @@
+# Virtual environments and IDEs
+venv/
+.venv/
+.vscode/
+.idea/
+.DS_Store
+.env
+
+# Large datasets and raw packet captures
+data/
+master_dataset/
+Dataset/
+Dataset
+datasets/
+CICIDS2018/
+team_datasets/
+team_datasets.zip/
+mlruns/
+notebooks/
+*.parquet
+
+# Heavy binaries and checkpoints (> 50MB)
+models/faiss_index.bin
+*.safetensors
+*.zip
+*.tar.gz
+
+# Frontend dependencies and cache
+node_modules/
+**/node_modules/
+.npm-cache/
+**/.npm-cache/
+
+# Runtime logs, databases, and caches
+logs/
+*.log
+*.db
+*.sqlite
+local_incidents.db
+__pycache__/
+*.pyc
+tmp/
+
+# Temporary scratch and lock files
+0.4
+0.5
+0.7
+.~lock.*

